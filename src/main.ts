@@ -6,4 +6,4 @@ function sayMyName(name: string): void {
   }
 }
 
-sayMyName('Heisenberg');
+export { sayMyName };

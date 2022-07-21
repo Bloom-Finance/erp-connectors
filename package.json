@@ -6,6 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx ts-node src/main.ts",
+    "start:quickbooks": "npx ts-node src/sandbox/quickbooks.ts --run-getInvoices",
     "transpile": "npx tsc && node dist/main.js"
   },
   "repository": {
