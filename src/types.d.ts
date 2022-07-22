@@ -1,12 +1,21 @@
 /**Connector and client interface**/
 interface IConnector {
-  getClient(): Client;
+  getClient<T extends ERPs>(
+    credentials: string,
+    erp: T
+  ): Client<T extends 'quickbooks' ? 'quickbooks' : 'salesforce'> | undefined;
   getInvoices(filters?: InvoiceFilters): Promise<Array<Invoice>>;
   getInvoice(): Promise<Invoice>;
 }
-interface Client {
-  merchant: string;
+interface Client<A extends ERPs> {
+  erpType: A;
+  erpCredentials: erpCredentials<A>;
 }
+type erpCredentials<T extends ERPs> = T extends 'quickbooks'
+  ? Quickbooks.client
+  : T extends 'salesforce'
+  ? SalesForce.client
+  : T;
 /**ERPs  related objects**/
 interface Invoice {
   id: string;
@@ -14,6 +23,7 @@ interface Invoice {
   customer: Customer;
   currency: Currencies;
 }
+type ERPs = 'salesforce' | 'quickbooks';
 type Currencies = 'ARS' | 'USD' | 'EUR' | 'ars' | 'usd' | 'eur';
 interface InvoiceFilters {
   status: string;
@@ -28,7 +38,14 @@ interface Customer extends Quickbooks.customer, SalesForce.customer {
 }
 /**ERPs namespaces**/
 declare namespace Quickbooks {
-  export type refreshToken = string;
+  export interface client {
+    credentials: {
+      client_id: string;
+      client_secret: string;
+    };
+    realmId: string;
+    refresh_token: string;
+  }
   export interface products {
     txDate?: string;
   }
@@ -37,7 +54,11 @@ declare namespace Quickbooks {
   }
 }
 declare namespace SalesForce {
-  export type client = string;
+  export interface client {
+    credentials: {
+      test: string;
+    };
+  }
   export interface products {
     billEmail?: string;
   }
