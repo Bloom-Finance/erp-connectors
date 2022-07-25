@@ -1,3 +1,4 @@
+import { IConnector } from '../types';
 import {
   Client,
   ERPs,
@@ -11,10 +12,16 @@ import {
   getQuickbooksClient,
   getSalesForceClient,
 } from '../utils/manageClients';
-class Connector {
+class Connector implements IConnector {
   constructor() {
     //staff
   }
+  /**
+   * It returns a client object based on the ERP type.
+   * @param credentials - erpCredentials<T>
+   * @param {T} erp - T - this is the type of ERP you want to connect to.
+   * @returns A client object
+   */
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
     erp: T
