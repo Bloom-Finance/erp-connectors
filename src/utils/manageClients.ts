@@ -1,29 +1,43 @@
-const decodeCredentials = (credentials: string) => {
-  //TODO: manage correctly credentials
-  return credentials;
-};
-const getQuickbooksClient = (merchant_id: string): Client<'quickbooks'> => {
-  //staff
+import { Client, Invoice, erpCredentials } from '../types';
+import { getInvoices } from './erpsActions';
+const getQuickbooksClient = (
+  credentials: erpCredentials<'quickbooks'>
+): Client<'quickbooks'> => {
   return {
+    async getInvoices(filters?) {
+      return getInvoices(
+        {
+          erpType: 'quickbooks',
+          erpCredentials: {
+            ...credentials,
+          },
+        },
+        filters
+      );
+    },
+    getInvoice() {
+      return {} as Promise<Invoice>;
+    },
     erpType: 'quickbooks',
     erpCredentials: {
-      credentials: {
-        client_id: '',
-        client_secret: '',
-      },
-      realmId: '',
-      refresh_token: '',
+      ...credentials,
     },
   };
 };
-const getSalesForceClient = (merchant_id: string): Client<'salesforce'> => {
+const getSalesForceClient = (
+  credentials: erpCredentials<'salesforce'>
+): Client<'salesforce'> => {
   return {
+    getInvoices(filters?) {
+      return {} as Promise<Invoice[]>;
+    },
+    getInvoice() {
+      return {} as Promise<Invoice>;
+    },
     erpType: 'salesforce',
     erpCredentials: {
-      credentials: {
-        test: '',
-      },
+      ...credentials,
     },
   };
 };
-export { getQuickbooksClient, decodeCredentials, getSalesForceClient };
+export { getQuickbooksClient, getSalesForceClient };

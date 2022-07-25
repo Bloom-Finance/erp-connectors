@@ -9,7 +9,14 @@ An internal library aimed to workalong bloom merchant and feed its interface.
 ```javascript
 import { Connector } from '@bloom/connector';
 
-const credentials = process.env.MY_CREDENTIALS;
+const credentials = {
+  credentials: {
+    client_id: '',
+    client_secret: '',
+  },
+  realmId: '',
+  refresh_token: '',
+};
 const connector = new Connector();
 const client = connector.getClient(credentials, '"quickbooks');
 ```

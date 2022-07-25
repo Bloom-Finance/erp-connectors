@@ -1,39 +1,47 @@
 /**Connector and client interface**/
-interface IConnector {
+export interface IConnector {
   getClient<T extends ERPs>(
-    credentials: string,
+    credentials: erpCredentials<T>,
     erp: T
   ): Client<T extends 'quickbooks' ? 'quickbooks' : 'salesforce'> | undefined;
-  getInvoices(filters?: InvoiceFilters): Promise<Array<Invoice>>;
+}
+export interface IClient {
+  getInvoices<T extends ERPs>(
+    credentials: erpCredentials<T>,
+    filters?: InvoiceFilters
+  ): Promise<Invoice[]>;
   getInvoice(): Promise<Invoice>;
 }
-interface Client<A extends ERPs> {
+export interface Client<A extends ERPs> {
   erpType: A;
   erpCredentials: erpCredentials<A>;
+  getInvoices(filters?: InvoiceFilters): Promise<Invoice[]>;
+  getInvoice(): Promise<Invoice>;
 }
-type erpCredentials<T extends ERPs> = T extends 'quickbooks'
+export type erpCredentials<T extends ERPs> = T extends 'quickbooks'
   ? Quickbooks.client
   : T extends 'salesforce'
   ? SalesForce.client
   : T;
 /**ERPs  related objects**/
-interface Invoice {
+export interface Invoice {
   id: string;
   products: Products;
   customer: Customer;
   currency: Currencies;
+  email: string;
 }
-type ERPs = 'salesforce' | 'quickbooks';
-type Currencies = 'ARS' | 'USD' | 'EUR' | 'ars' | 'usd' | 'eur';
-interface InvoiceFilters {
+export type ERPs = 'salesforce' | 'quickbooks';
+export type Currencies = 'ARS' | 'USD' | 'EUR' | 'ars' | 'usd' | 'eur';
+export interface InvoiceFilters {
   status: string;
-  from: bigint;
-  to: bigint;
+  from: number;
+  to: number;
 }
-interface Products extends Quickbooks.products, SalesForce.products {
+export interface Products extends Quickbooks.products, SalesForce.products {
   id: string;
 }
-interface Customer extends Quickbooks.customer, SalesForce.customer {
+export interface Customer extends Quickbooks.customer, SalesForce.customer {
   id: string;
 }
 /**ERPs namespaces**/
@@ -47,10 +55,10 @@ declare namespace Quickbooks {
     refresh_token: string;
   }
   export interface products {
-    txDate?: string;
+    txDate: string;
   }
   export interface customer {
-    email?: string;
+    email: string;
   }
 }
 declare namespace SalesForce {
