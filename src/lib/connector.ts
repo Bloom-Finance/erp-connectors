@@ -1,6 +1,7 @@
-import { IConnector } from '../types';
+import { Contabilium, IConnector } from '../types';
 import { Client, ERPs, erpCredentials, Quickbooks, SalesForce } from '../types';
 import {
+  getContabiliumClient,
   getQuickbooksClient,
   getSalesForceClient,
 } from '../utils/manageClients';
@@ -31,6 +32,8 @@ class Connector implements IConnector {
         return getQuickbooksClient(credentials as Quickbooks.client) as any;
       case 'salesforce':
         return getSalesForceClient(credentials as SalesForce.client) as any;
+      case 'contabilium':
+        return getContabiliumClient(credentials as Contabilium.client) as any;
       default:
         return undefined;
     }

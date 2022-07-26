@@ -20,12 +20,13 @@ export interface Client<A extends ERPs> {
   getInvoice(id: string): Promise<Invoice>;
   getCustomers(): Promise<Customer[]>;
 }
+
+/**ERPs  related objects**/
 export type erpCredentials<T extends ERPs> = T extends 'quickbooks'
   ? Quickbooks.client
   : T extends 'salesforce'
   ? SalesForce.client
   : Contabilium.client;
-/**ERPs  related objects**/
 export interface Invoice {
   id: string;
   products: Products;
@@ -52,6 +53,7 @@ export interface Customer
     Contabilium.customer {
   id: string;
 }
+
 /**ERPs namespaces**/
 declare namespace Quickbooks {
   export interface client {
