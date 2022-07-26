@@ -1,13 +1,5 @@
 import { IConnector } from '../types';
-import {
-  Client,
-  ERPs,
-  erpCredentials,
-  InvoiceFilters,
-  Invoice,
-  Quickbooks,
-  SalesForce,
-} from '../types';
+import { Client, ERPs, erpCredentials, Quickbooks, SalesForce } from '../types';
 import {
   getQuickbooksClient,
   getSalesForceClient,
@@ -25,7 +17,15 @@ class Connector implements IConnector {
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
     erp: T
-  ): Client<T extends 'quickbooks' ? 'quickbooks' : 'salesforce'> | undefined {
+  ):
+    | Client<
+        T extends 'quickbooks'
+          ? 'quickbooks'
+          : T extends 'salesforce'
+          ? 'salesforce'
+          : 'contabilium'
+      >
+    | undefined {
     switch (erp) {
       case 'quickbooks':
         return getQuickbooksClient(credentials as Quickbooks.client) as any;

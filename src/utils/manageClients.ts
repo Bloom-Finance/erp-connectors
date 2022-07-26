@@ -1,57 +1,68 @@
-import { Client, Invoice, erpCredentials } from '../types';
-import { getInvoices } from './erpsActions';
+import { Client, Invoice, erpCredentials, ERPs } from '../types';
+import { getCustomers, getInvoice, getInvoices } from './erpsActions';
+
 /**
- * It takes in a set of credentials and returns a client object that can be used to make requests to
- * the Quickbooks API
+ * It takes in an object of credentials and an ERP type, and returns an object with a getInvoices and
+ * getInvoice function
+ * @param credentials - erpCredentials<T>
+ * @param {T} type - ERPs - this is the type of ERP you're connecting to.
+ * @returns A function that takes in a type and returns a client
+ */
+const setClient = <T extends ERPs>(
+  credentials: erpCredentials<T>,
+  type: T
+): Client<T> => {
+  const creds: any = {
+    erpType: type,
+    erpCredentials: {
+      ...credentials,
+    },
+  };
+  return {
+    getInvoices(filters?) {
+      return getInvoices(creds, filters);
+    },
+    getInvoice(id: string) {
+      return getInvoice(creds, id);
+    },
+    getCustomers() {
+      return getCustomers(creds);
+    },
+    ...creds,
+  };
+};
+
+/**
+ * It takes in a credentials object and returns a client object
  * @param credentials - erpCredentials<'quickbooks'>
- * @returns A function that returns a client object
+ * @returns A function that takes in a credentials object and returns a client object.
  */
 const getQuickbooksClient = (
   credentials: erpCredentials<'quickbooks'>
 ): Client<'quickbooks'> => {
-  return {
-    async getInvoices(filters?) {
-      return getInvoices(
-        {
-          erpType: 'quickbooks',
-          erpCredentials: {
-            ...credentials,
-          },
-        },
-        filters
-      );
-    },
-    getInvoice() {
-      return {} as Promise<Invoice>;
-    },
-    erpType: 'quickbooks',
-    erpCredentials: {
-      ...credentials,
-    },
-  };
+  return setClient(credentials, 'quickbooks');
 };
+
 /**
- * It returns a client object that has a getInvoices method that returns a promise of an array of
- * invoices, a getInvoice method that returns a promise of an invoice, and a erpType property that is a
- * string literal of 'salesforce' and an erpCredentials property that is the credentials object passed
- * in
+ * It returns a client object that can be used to make requests to the Salesforce API.
  * @param credentials - erpCredentials<'salesforce'>
- * @returns A function that returns a Client object.
+ * @returns A function that takes in credentials and returns a client.
  */
 const getSalesForceClient = (
   credentials: erpCredentials<'salesforce'>
 ): Client<'salesforce'> => {
-  return {
-    getInvoices(filters?) {
-      return {} as Promise<Invoice[]>;
-    },
-    getInvoice() {
-      return {} as Promise<Invoice>;
-    },
-    erpType: 'salesforce',
-    erpCredentials: {
-      ...credentials,
-    },
-  };
+  return setClient(credentials, 'salesforce');
 };
-export { getQuickbooksClient, getSalesForceClient };
+
+/**
+ * It takes an object with the credentials of the ERP and returns a client object with the methods to
+ * interact with the ERP
+ * @param credentials - erpCredentials<'contabilium'>
+ * @returns A function that returns a Client object.
+ */
+const getContabiliumClient = (
+  credentials: erpCredentials<'contabilium'>
+): Client<'contabilium'> => {
+  return setClient(credentials, 'contabilium');
+};
+export { getQuickbooksClient, getSalesForceClient, getContabiliumClient };
