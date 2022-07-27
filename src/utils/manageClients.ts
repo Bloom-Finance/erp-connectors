@@ -1,5 +1,10 @@
 import { Client, Invoice, erpCredentials, ERPs } from '../types';
-import { getCustomers, getInvoice, getInvoices } from './erpsActions';
+import {
+  getCustomer,
+  getCustomers,
+  getInvoice,
+  getInvoices,
+} from './erpsActions';
 
 /**
  * It takes in an object of credentials and an ERP type, and returns an object with a getInvoices and
@@ -27,6 +32,9 @@ const setClient = <T extends ERPs>(
     },
     getCustomers() {
       return getCustomers(creds);
+    },
+    getCustomer(id: string) {
+      return getCustomer(creds, id);
     },
     ...creds,
   };

@@ -1,3 +1,4 @@
+import { description } from '../../merchant/src/_mock/text';
 /**Connector and client interface**/
 export interface IConnector {
   getClient<T extends ERPs>(
@@ -13,12 +14,36 @@ export interface IConnector {
       >
     | undefined;
 }
+
+export interface IERPConnector {
+  getInvoices(
+    filters?: Filters,
+    pagination?: Pagination,
+    sort?: Sort
+  ): Promise<Invoice[]>;
+  getInvoice(id: string): Promise<Invoice>;
+  getCustomers(
+    filters?: Filters,
+    pagination?: Pagination,
+    sort?: Sort
+  ): Promise<Customer[]>;
+  getCustomer(id: string): Promise<Customer>;
+}
 export interface Client<A extends ERPs> {
   erpType: A;
   erpCredentials: erpCredentials<A>;
-  getInvoices(filters?: InvoiceFilters): Promise<Invoice[]>;
+  getInvoices(
+    filters?: Filters,
+    pagination?: Pagination,
+    sort?: Sort
+  ): Promise<Invoice[]>;
   getInvoice(id: string): Promise<Invoice>;
-  getCustomers(): Promise<Customer[]>;
+  getCustomers(
+    filters?: Filters,
+    pagination?: Pagination,
+    sort?: Sort
+  ): Promise<Customer[]>;
+  getCustomer(id: string): Promise<Customer>;
 }
 
 /**ERPs  related objects**/
@@ -29,33 +54,60 @@ export type erpCredentials<T extends ERPs> = T extends 'quickbooks'
   : Contabilium.client;
 export interface Invoice {
   id: string;
-  products: Products;
-  customer: Customer;
-  currency: Currencies;
-  email: string;
+  products: Products[];
+  customer: {
+    id: string;
+  };
+  email?: string;
+  status: 'paid' | 'unpaid' | 'overdue' | 'draft';
+  createdAt: number;
+  dueDate: number;
 }
 export type ERPs = 'salesforce' | 'quickbooks' | 'contabilium';
 export type Currencies = 'ARS' | 'USD' | 'EUR' | 'ars' | 'usd' | 'eur';
-export interface InvoiceFilters {
+export interface Filters {
   status: string;
   from: number;
   to: number;
 }
-export interface Products
-  extends Quickbooks.products,
-    SalesForce.products,
-    Contabilium.products {
-  id: string;
+export interface Pagination {
+  offset: number;
+  limit: number;
 }
-export interface Customer
-  extends Quickbooks.customer,
-    SalesForce.customer,
-    Contabilium.customer {
-  id: string;
+export interface Sort {
+  fieldName: string;
+  order: 'asc' | 'desc';
 }
-
+export interface Products {
+  id?: string;
+  description?: string;
+  amount: number;
+}
+export interface Customer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  billAddress: string | null;
+}
 /**ERPs namespaces**/
 declare namespace Quickbooks {
+  export interface error {
+    response: {
+      data: {
+        Fault: {
+          type: 'ValidationFault' | 'other';
+          Error: {
+            Message: string;
+            Detail: string;
+            code: string;
+            element: string;
+          };
+        };
+        time: string;
+      };
+    };
+  }
   export interface client {
     credentials: {
       client_id: string;
@@ -63,12 +115,73 @@ declare namespace Quickbooks {
     };
     realmId: string;
     refresh_token: string;
+    access_token: string;
   }
   export interface products {
-    txDate: string;
+    Description: string;
+    DetailType: string;
+    LineNum: number;
+    Amount: number;
+    Id: string;
+    SalesItemLineDetail: {
+      TaxCodeRef: {
+        value: string;
+      };
+      Qty: number;
+      UnitPrice: number;
+      ServiceDate: string;
+      ItemRef: {
+        name: string;
+        value: string;
+      };
+    };
+  }
+  export interface Invoice {
+    Id: string;
+    TxnDate: string;
+    domain: string;
+    CurrencyRef: {
+      name: string;
+      value: string;
+    };
+    ShipDate: string;
+    TrackingNum: string;
+    ClassRef: {
+      name: string;
+      value: string;
+    };
+    PrintStatus: string;
+    SalesTermRef: {
+      value: string;
+    };
+    DeliveryInfo: {
+      DeliveryType: string;
+      DeliveryTime: string;
+    };
+    TotalAmt: number;
+    Line: Quickbooks.products[];
+    CustomerRef: {
+      value: string;
+    };
+    BillEmail: {
+      address: string;
+    };
+    EmailStatus: string;
   }
   export interface customer {
-    email: string;
+    PrimaryEmailAddr: {
+      Address: string;
+    };
+    GivenName: string;
+    DisplayName: string;
+    CompanyName: string;
+    PrimaryPhone: {
+      FreeFormNumber: string;
+    };
+    BillAddr: {
+      Line1: string;
+    };
+    Id: string;
   }
 }
 declare namespace SalesForce {

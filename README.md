@@ -18,7 +18,11 @@ const credentials = {
   refresh_token: '',
 };
 const connector = new Connector();
-const client = connector.getClient(credentials, '"quickbooks');
+const client = connector.getClient(credentials, 'quickbooks');
+client?.getInvoice('99').then((invoices) => {
+  //your invoice
+  console.log(invoices.products);
+});
 ```
 
 ### Supported ERPS ⚙️
