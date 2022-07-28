@@ -1,5 +1,5 @@
 {
-  "name": "erp-connectors",
+  "name": "connector",
   "version": "0.0.1",
   "description": "A package to internally connect a merchant with erp that bloom could handle",
   "main": "dist/index.js",
