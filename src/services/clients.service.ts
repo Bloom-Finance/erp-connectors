@@ -1,10 +1,18 @@
-import { Client, Invoice, erpCredentials, ERPs } from '../types';
+import {
+  Client,
+  Invoice,
+  erpCredentials,
+  ERPs,
+  Pagination,
+  Sort,
+  Filters,
+} from '../types';
 import {
   getCustomer,
   getCustomers,
   getInvoice,
   getInvoices,
-} from './erpsActions';
+} from './erps.service';
 
 /**
  * It takes in an object of credentials and an ERP type, and returns an object with a getInvoices and
@@ -24,14 +32,14 @@ const setClient = <T extends ERPs>(
     },
   };
   return {
-    getInvoices(filters?) {
-      return getInvoices(creds, filters);
+    getInvoices(filters?: Filters, pagination?: Pagination, sort?: Sort) {
+      return getInvoices(creds, filters, pagination, sort);
     },
     getInvoice(id: string) {
       return getInvoice(creds, id);
     },
-    getCustomers() {
-      return getCustomers(creds);
+    getCustomers(pagination: Pagination, sort: Sort) {
+      return getCustomers(creds, pagination, sort);
     },
     getCustomer(id: string) {
       return getCustomer(creds, id);

@@ -4,7 +4,7 @@ import {
   getContabiliumClient,
   getQuickbooksClient,
   getSalesForceClient,
-} from '../utils/manageClients';
+} from '../services/clients.service';
 class Connector implements IConnector {
   constructor() {
     //staff
@@ -18,15 +18,13 @@ class Connector implements IConnector {
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
     erp: T
-  ):
-    | Client<
-        T extends 'quickbooks'
-          ? 'quickbooks'
-          : T extends 'salesforce'
-          ? 'salesforce'
-          : 'contabilium'
-      >
-    | undefined {
+  ): Client<
+    T extends 'quickbooks'
+      ? 'quickbooks'
+      : T extends 'salesforce'
+      ? 'salesforce'
+      : 'contabilium'
+  > {
     switch (erp) {
       case 'quickbooks':
         return getQuickbooksClient(credentials as Quickbooks.client) as any;
@@ -35,7 +33,7 @@ class Connector implements IConnector {
       case 'contabilium':
         return getContabiliumClient(credentials as Contabilium.client) as any;
       default:
-        return undefined;
+        throw new Error(`${erp} is not a valid ERP type`);
     }
   }
 }

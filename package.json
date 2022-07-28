@@ -8,13 +8,16 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx ts-node src/main.ts",
     "start:quickbooks": "npx ts-node src/sandbox/quickbooks.ts",
-    "transpile": "npx tsc && node dist/main.js"
+    "build": "npx tsc"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Bloom-Finance/erp-connectors.git"
+    "url": "git://github.com/Bloom-Finance/erp-connectors.git"
   },
-  "author": "Alex Fiorenza",
+  "author": "Bloom Trade",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Bloom-Finance/erp-connectors/issues"
@@ -31,6 +34,7 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
-    "lodash": "^4.17.21"
+    "lodash": "^4.17.21",
+    "moment": "^2.29.4"
   }
 }

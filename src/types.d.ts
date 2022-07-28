@@ -4,15 +4,13 @@ export interface IConnector {
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
     erp: T
-  ):
-    | Client<
-        T extends 'quickbooks'
-          ? 'quickbooks'
-          : T extends 'salesforce'
-          ? 'salesforce'
-          : 'contabilium'
-      >
-    | undefined;
+  ): Client<
+    T extends 'quickbooks'
+      ? 'quickbooks'
+      : T extends 'salesforce'
+      ? 'salesforce'
+      : 'contabilium'
+  >;
 }
 
 export interface IERPConnector {
@@ -22,11 +20,7 @@ export interface IERPConnector {
     sort?: Sort
   ): Promise<Invoice[]>;
   getInvoice(id: string): Promise<Invoice>;
-  getCustomers(
-    filters?: Filters,
-    pagination?: Pagination,
-    sort?: Sort
-  ): Promise<Customer[]>;
+  getCustomers(pagination?: Pagination, sort?: Sort): Promise<Customer[]>;
   getCustomer(id: string): Promise<Customer>;
 }
 export interface Client<A extends ERPs> {
@@ -38,11 +32,7 @@ export interface Client<A extends ERPs> {
     sort?: Sort
   ): Promise<Invoice[]>;
   getInvoice(id: string): Promise<Invoice>;
-  getCustomers(
-    filters?: Filters,
-    pagination?: Pagination,
-    sort?: Sort
-  ): Promise<Customer[]>;
+  getCustomers(pagination?: Pagination, sort?: Sort): Promise<Customer[]>;
   getCustomer(id: string): Promise<Customer>;
 }
 
@@ -62,17 +52,18 @@ export interface Invoice {
   status: 'paid' | 'unpaid' | 'overdue' | 'draft';
   createdAt: number;
   dueDate: number;
+  amount: number;
 }
 export type ERPs = 'salesforce' | 'quickbooks' | 'contabilium';
 export type Currencies = 'ARS' | 'USD' | 'EUR' | 'ars' | 'usd' | 'eur';
 export interface Filters {
-  status: string;
-  from: number;
-  to: number;
+  status: 'paid' | 'unpaid' | 'overdue' | 'draft' | 'all';
+  fromDate?: number;
+  toDate?: number;
 }
 export interface Pagination {
-  offset: number;
-  limit: number;
+  offset?: number;
+  limit?: number;
 }
 export interface Sort {
   fieldName: string;
@@ -167,6 +158,11 @@ declare namespace Quickbooks {
       address: string;
     };
     EmailStatus: string;
+    DueDate: string;
+    Balance: number;
+    MetaData: {
+      CreateTime: string;
+    };
   }
   export interface customer {
     PrimaryEmailAddr: {

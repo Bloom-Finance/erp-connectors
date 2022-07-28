@@ -1,14 +1,24 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import axios from 'axios';
-import { ERPs, Filters, Invoice, erpCredentials, Customer } from '../types';
+import {
+  ERPs,
+  Filters,
+  Invoice,
+  erpCredentials,
+  Customer,
+  Pagination,
+  Sort,
+} from '../types';
 const getInvoices = async <T extends ERPs>(
   credentials: { erpType: T; erpCredentials: erpCredentials<T> },
-  filters?: Filters
+  filters?: Filters,
+  pagination?: Pagination,
+  sort?: Sort
 ): Promise<Invoice[]> => {
   const { ERPConnectorImpl } = require(`../impl/${credentials.erpType}/index`);
   const service = new ERPConnectorImpl(credentials.erpCredentials);
-  const invoices = await service.getInvoices();
+  const invoices = await service.getInvoices(filters, pagination, sort);
   return invoices as Invoice[];
 };
 const getInvoice = async <T extends ERPs>(
@@ -23,13 +33,17 @@ const getInvoice = async <T extends ERPs>(
   const myInvoice = await service.getInvoice(id);
   return myInvoice as Invoice;
 };
-const getCustomers = async <T extends ERPs>(credentials: {
-  erpType: T;
-  erpCredentials: erpCredentials<T>;
-}): Promise<Customer[]> => {
+const getCustomers = async <T extends ERPs>(
+  credentials: {
+    erpType: T;
+    erpCredentials: erpCredentials<T>;
+  },
+  pagination?: Pagination,
+  sort?: Sort
+): Promise<Customer[]> => {
   const { ERPConnectorImpl } = require(`../impl/${credentials.erpType}/index`);
   const service = new ERPConnectorImpl(credentials.erpCredentials);
-  const customers = await service.getCustomers();
+  const customers = await service.getCustomers(pagination, sort);
   return customers as Customer[];
 };
 const getCustomer = async <T extends ERPs>(
