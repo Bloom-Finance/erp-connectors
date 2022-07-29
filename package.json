@@ -1,9 +1,9 @@
 {
-  "name": "connector",
-  "version": "0.0.1",
+  "name": "@bloom-trade/connector",
+  "version": "0.1.0",
   "description": "A package to internally connect a merchant with erp that bloom could handle",
-  "main": "dist/index.js",
-  "types": "./src/types.d.ts",
+  "main": "dist/main.js",
+  "module": "dist/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx ts-node src/main.ts",
@@ -15,9 +15,6 @@
     "url": "git://github.com/Bloom-Finance/erp-connectors.git"
   },
   "author": "Bloom Trade",
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/Bloom-Finance/erp-connectors/issues"
@@ -36,5 +33,13 @@
     "axios": "^0.27.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4"
-  }
+  },
+  "keywords": [
+    "quickbooks",
+    "contabilium",
+    "salesforce"
+  ],
+  "files": [
+    "dist"
+  ]
 }

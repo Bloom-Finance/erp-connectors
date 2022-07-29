@@ -1,5 +1,11 @@
-import { Contabilium, IConnector } from '../types';
-import { Client, ERPs, erpCredentials, Quickbooks, SalesForce } from '../types';
+import { Contabilium, IConnector } from '../@types';
+import {
+  Client,
+  ERPs,
+  erpCredentials,
+  Quickbooks,
+  SalesForce,
+} from '../@types';
 import {
   getContabiliumClient,
   getQuickbooksClient,

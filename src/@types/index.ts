@@ -1,4 +1,4 @@
-import { description } from '../../merchant/src/_mock/text';
+/* eslint-disable @typescript-eslint/no-namespace */
 /**Connector and client interface**/
 export interface IConnector {
   getClient<T extends ERPs>(
@@ -82,7 +82,7 @@ export interface Customer {
   billAddress: string | null;
 }
 /**ERPs namespaces**/
-declare namespace Quickbooks {
+export namespace Quickbooks {
   export interface error {
     response: {
       data: {
@@ -180,7 +180,7 @@ declare namespace Quickbooks {
     Id: string;
   }
 }
-declare namespace SalesForce {
+export namespace SalesForce {
   export interface client {
     credentials: {
       test: string;
@@ -193,7 +193,7 @@ declare namespace SalesForce {
     phone?: string;
   }
 }
-declare namespace Contabilium {
+export namespace Contabilium {
   export interface client {
     credentials: {
       test: string;

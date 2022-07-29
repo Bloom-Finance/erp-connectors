@@ -4,10 +4,10 @@ An internal library aimed to workalong bloom merchant and feed its interface.
 
 ## Get Started
 
-    npm install @bloom/connector
+    npm install @bloom-trade/connector
 
 ```javascript
-import { Connector } from '@bloom/connector';
+import Connector from '@bloom-trade/connector';
 
 const credentials = {
   credentials: {
@@ -28,3 +28,5 @@ client?.getInvoice('99').then((invoices) => {
 ### Supported ERPS ⚙️
 
 - [Quickbooks](https://developer.intuit.com/app/developer/qbo/docs/get-started) 📚
+- [Salesforce](https://www.salesforce.com/) 📚
+- [Contabilium](https://contabilium.com/) 📚

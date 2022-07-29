@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Pagination, Sort } from '../types';
+import { Pagination, Sort } from '../@types';
 /**
  * It returns true if the date is after the reference date, and false if it's not
  * @param {string} date - The date to be checked

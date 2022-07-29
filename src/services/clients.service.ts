@@ -6,7 +6,7 @@ import {
   Pagination,
   Sort,
   Filters,
-} from '../types';
+} from '../@types';
 import {
   getCustomer,
   getCustomers,

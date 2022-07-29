@@ -1,4 +1,4 @@
-import { Invoice } from '../../types';
+import { Invoice } from '../../@types';
 import { ERPConnector } from '../credentials';
 export class ERPConnectorImpl extends ERPConnector {
   getInvoice(id: string): Promise<Invoice> {

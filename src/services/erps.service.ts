@@ -9,7 +9,7 @@ import {
   Customer,
   Pagination,
   Sort,
-} from '../types';
+} from '../@types';
 const getInvoices = async <T extends ERPs>(
   credentials: { erpType: T; erpCredentials: erpCredentials<T> },
   filters?: Filters,

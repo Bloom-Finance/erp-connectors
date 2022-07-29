@@ -7,9 +7,9 @@ import {
   Sort,
   IERPConnector,
   Quickbooks,
-} from '../../types';
+} from '../../@types';
 import { ERPConnector } from '../credentials';
-import { erpCredentials, Products } from '../../types';
+import { erpCredentials, Products } from '../../@types';
 import axios from 'axios';
 import moment from 'moment';
 import { applySQLFilters, isDateExpired } from '../../utils/utils';
