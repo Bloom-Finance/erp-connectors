@@ -184,4 +184,6 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
     });
     return myCustomers;
   }
+  // async logIn() {}
+  // async getCredentials() {}
 }

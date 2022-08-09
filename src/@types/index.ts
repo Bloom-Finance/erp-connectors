@@ -11,6 +11,7 @@ export interface IConnector {
       ? 'salesforce'
       : 'contabilium'
   >;
+  logIn(erp: ERPs, creds: any): void;
 }
 
 export interface IERPConnector {
