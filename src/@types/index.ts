@@ -12,7 +12,12 @@ export interface IConnector {
       : 'contabilium'
   >;
   logIn(erp: ERPs, creds: any): void;
+  authenticate(apiCredentials: any): void; // Solo hace la autenticacion y guarda en el indexDB los datos para luego conectarse  
+  getCredentials(): any; // Toma del indexDB las credenciales del Merchant que luego es necceario para. el connect 
+  isAuthenticated(): boolean // Determina si esta autenticado el merchant
 }
+
+
 
 export interface IERPConnector {
   getInvoices(
