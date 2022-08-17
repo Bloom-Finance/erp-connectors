@@ -40,6 +40,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
         billAddress: data.Customer.BillAddr
           ? data.Customer.BillAddr.Line1
           : null,
+        type: 'customer',
       };
       return myCustomer;
     } catch (error: any) {
@@ -73,6 +74,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
             id: line.Id,
             description: line.Description,
             amount: line.Amount,
+            type: 'invoice',
           });
         });
         const isOverdue = isDateExpired(
@@ -91,6 +93,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
           createdAt: moment(v.MetaData.CreateTime).toDate().getTime(),
           dueDate: moment(v.DueDate, 'YYYY-MM-DD').toDate().getTime(),
           amount: v.TotalAmt,
+          type: 'invoice',
         });
       });
       if (filters) {
@@ -131,6 +134,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
           id: line.Id,
           description: line.Description,
           amount: line.Amount,
+          type: 'invoice',
         });
       });
       const isOverdue = isDateExpired(
@@ -149,6 +153,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
         createdAt: moment(data.Invoice.MetaData.CreateTime).toDate().getTime(),
         dueDate: moment(data.Invoice.DueDate, 'YYYY-MM-DD').toDate().getTime(),
         amount: data.Invoice.TotalAmt,
+        type: 'invoice',
       };
       return myInvoice;
     } catch (error: any) {
@@ -180,6 +185,7 @@ export class ERPConnectorImpl extends ERPConnector implements IERPConnector {
         name: v.DisplayName,
         phone: v.PrimaryPhone ? v.PrimaryPhone.FreeFormNumber : undefined,
         billAddress: v.BillAddr ? v.BillAddr.Line1 : null,
+        type: 'invoice',
       });
     });
     return myCustomers;

@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { Contabilium, IConnector } from '../@types';
+import nano from 'nano';
+import {
+  Contabilium,
+  CouchDBCredentials,
+  Customer,
+  IConnector,
+  Invoice,
+} from '../@types';
 import {
   Client,
   ERPs,
@@ -12,28 +19,55 @@ import {
   getQuickbooksClient,
   getSalesForceClient,
 } from '../services/clients.service';
+import CouchDB from '../services/couchdb.service';
+import { CouchDbCollections } from '../../dist/erp-connectors/src/@types/index';
 class Connector implements IConnector {
   constructor() {
     //staff
   }
   /**
-   * It takes an ERP name and credentials, and returns a session object
-   * @param {ERPs} erp - ERPs - This is the ERP that you want to log in to.
-   * @param {any} credentials - This is the object that contains immutable credentials for the ERP. (API_KEY,CLIENT_ID,ETC)
-   * @returns The session object.
+   * It saves the Quickbooks credentials to the database
+   * @param credentials - Quickbooks.client
    */
-  async logIn(
-    erpType: ERPs,
-    client: {
-      enabled: boolean;
-      credentials: any;
+  async setQuickbooksCredentials(
+    credentials: Quickbooks.client
+  ): Promise<nano.DocumentInsertResponse> {
+    const couchdb = new CouchDB('admin0', 'alex1234', 'bloom-merchant');
+    const res = await couchdb.updateCredentials(
+      'jurassic-lake',
+      'quickbooks',
+      credentials
+    );
+    return res;
+  }
+  /**
+   * It takes in an object of API credentials and an ERP name, and returns a URL if the ERP is
+   * QuickBooks, otherwise it returns nothing
+   * @param {any} apiCredentials - This is the object that contains the API credentials.
+   * @param {ERPs} erp - ERPs - This is the ERP that you are using.
+   * @returns A promise that resolves to a string or void.
+   */
+  async authenticate(apiCredentials: any, erp: ERPs): Promise<void | string> {
+    const { auth } = require(`../impl/${erp}/auth`);
+    if (erp === 'quickbooks') {
+      const url = await auth(apiCredentials);
+      return url;
+    } else {
+      await auth(apiCredentials);
     }
-  ): Promise<any> {
-    const { logIn } = require(`../impl/${erpType}/login`);
-    const session = await logIn(client);
-    return {
-      ...session,
-    };
+  }
+  /**
+   * It returns a promise that resolves to an object that has a property called `erp` that is of type
+   * `T` and a property called `credentials` that is of type `erpCredentials<T>`
+   * @param {T} erp - The ERP you want to get the credentials for.
+   * @returns A promise that resolves to an object of type erpCredentials<T>
+   */
+  getCredentials<T extends ERPs>(erp: T): Promise<erpCredentials<T>> {
+    // return rxDb.getCredentials(erp);
+    return Promise.resolve({} as erpCredentials<T>);
+  }
+  isAuthenticated(): boolean {
+    throw new Error('Method not implemented.');
   }
   /**
    * It returns a client object based on the ERP type.
@@ -43,7 +77,8 @@ class Connector implements IConnector {
    */
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
-    erp: T
+    erp: T,
+    couchdb: CouchDBCredentials
   ): Client<
     T extends 'quickbooks'
       ? 'quickbooks'
@@ -53,11 +88,20 @@ class Connector implements IConnector {
   > {
     switch (erp) {
       case 'quickbooks':
-        return getQuickbooksClient(credentials as Quickbooks.client) as any;
+        return getQuickbooksClient(
+          credentials as Quickbooks.client,
+          couchdb
+        ) as any;
       case 'salesforce':
-        return getSalesForceClient(credentials as SalesForce.client) as any;
+        return getSalesForceClient(
+          credentials as SalesForce.client,
+          couchdb
+        ) as any;
       case 'contabilium':
-        return getContabiliumClient(credentials as Contabilium.client) as any;
+        return getContabiliumClient(
+          credentials as Contabilium.client,
+          couchdb
+        ) as any;
       default:
         throw new Error(`${erp} is not a valid ERP type`);
     }

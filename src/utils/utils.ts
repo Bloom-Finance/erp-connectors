@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Pagination, Sort } from '../@types';
+import OAuthClient = require('intuit-oauth');
 /**
  * It returns true if the date is after the reference date, and false if it's not
  * @param {string} date - The date to be checked
@@ -24,4 +25,27 @@ const applySQLFilters = (pagination?: Pagination, sort?: Sort) => {
   return sql;
 };
 
-export { isDateExpired, applySQLFilters };
+const logInToQuickbooks = (
+  client: {
+    client_id: string;
+    client_secret: string;
+  },
+  env: 'sandbox' | 'production',
+  redirectUri: string,
+  logging = false
+) => {
+  const authClient = new OAuthClient({
+    clientId: client.client_id,
+    clientSecret: client.client_secret,
+    redirectUri: redirectUri,
+    logging,
+    environment: env,
+  });
+  const url = authClient.authorizeUri({
+    scope: [OAuthClient.scopes.Accounting],
+    state: 'intuit-test' as any,
+  });
+  return url;
+};
+
+export { isDateExpired, applySQLFilters, logInToQuickbooks };

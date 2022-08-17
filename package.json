@@ -1,6 +1,6 @@
 {
   "name": "@bloom-trade/connector",
-  "version": "0.1.0",
+  "version": "0.1.8",
   "description": "A package to internally connect a merchant with erp that bloom could handle",
   "main": "dist/main.js",
   "module": "dist/main.js",
@@ -31,8 +31,12 @@
   },
   "dependencies": {
     "axios": "^0.27.2",
+    "intuit-oauth": "^4.0.0",
     "lodash": "^4.17.21",
-    "moment": "^2.29.4"
+    "moment": "^2.29.4",
+    "nano": "^10.0.0",
+    "rxdb": "^12.7.16",
+    "rxjs": "^7.5.6"
   },
   "keywords": [
     "quickbooks",

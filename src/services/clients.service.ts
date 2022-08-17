@@ -1,3 +1,4 @@
+import { CouchDBCredentials, Customer } from '../@types/index';
 import {
   Client,
   Invoice,
@@ -13,6 +14,7 @@ import {
   getInvoice,
   getInvoices,
 } from './erps.service';
+import CouchDB from './couchdb.service';
 
 /**
  * It takes in an object of credentials and an ERP type, and returns an object with a getInvoices and
@@ -23,7 +25,8 @@ import {
  */
 const setClient = <T extends ERPs>(
   credentials: erpCredentials<T>,
-  type: T
+  type: T,
+  couchdb: CouchDBCredentials
 ): Client<T> => {
   const creds: any = {
     erpType: type,
@@ -31,6 +34,11 @@ const setClient = <T extends ERPs>(
       ...credentials,
     },
   };
+  const couchDbInstance = new CouchDB(
+    couchdb.user,
+    couchdb.password,
+    couchdb.database
+  );
   return {
     getInvoices(filters?: Filters, pagination?: Pagination, sort?: Sort) {
       return getInvoices(creds, filters, pagination, sort);
@@ -45,40 +53,68 @@ const setClient = <T extends ERPs>(
       return getCustomer(creds, id);
     },
     ...creds,
+    couchDB: {
+      credentials: {
+        ...couchdb,
+      },
+      async insertDocs(docs: Invoice[] | Customer[]) {
+        docs.forEach(async (element) => {
+          await couchDbInstance.insert(element);
+        });
+      },
+      async updateCredentials(id: string, erpType: ERPs, credentials: any) {
+        const res = await couchDbInstance.updateCredentials(
+          id,
+          erpType,
+          credentials
+        );
+        return res;
+      },
+    },
   };
 };
 
 /**
- * It takes in a credentials object and returns a client object
+ * It takes in a set of credentials for a specific ERP, and returns a client object that can be used to
+ * make requests to that ERP
  * @param credentials - erpCredentials<'quickbooks'>
- * @returns A function that takes in a credentials object and returns a client object.
+ * @param {CouchDBCredentials} couchdb - CouchDBCredentials
+ * @returns A function that takes in a credentials object and a couchdb object and returns a client
+ * object.
  */
 const getQuickbooksClient = (
-  credentials: erpCredentials<'quickbooks'>
+  credentials: erpCredentials<'quickbooks'>,
+  couchdb: CouchDBCredentials
 ): Client<'quickbooks'> => {
-  return setClient(credentials, 'quickbooks');
+  return setClient(credentials, 'quickbooks', couchdb);
 };
 
 /**
- * It returns a client object that can be used to make requests to the Salesforce API.
+ * It takes in a set of credentials for a specific ERP, and returns a client object that can be used to
+ * interact with that ERP
  * @param credentials - erpCredentials<'salesforce'>
- * @returns A function that takes in credentials and returns a client.
+ * @param {CouchDBCredentials} couchdb - CouchDBCredentials
+ * @returns A function that takes in a credentials object and a couchdb object and returns a client
+ * object.
  */
 const getSalesForceClient = (
-  credentials: erpCredentials<'salesforce'>
+  credentials: erpCredentials<'salesforce'>,
+  couchdb: CouchDBCredentials
 ): Client<'salesforce'> => {
-  return setClient(credentials, 'salesforce');
+  return setClient(credentials, 'salesforce', couchdb);
 };
 
 /**
- * It takes an object with the credentials of the ERP and returns a client object with the methods to
- * interact with the ERP
+ * It takes in a set of credentials for the ERP and for the CouchDB database, and returns a client
+ * object that can be used to interact with the ERP
  * @param credentials - erpCredentials<'contabilium'>
+ * @param {CouchDBCredentials} couchdb - CouchDBCredentials
  * @returns A function that returns a Client object.
  */
 const getContabiliumClient = (
-  credentials: erpCredentials<'contabilium'>
+  credentials: erpCredentials<'contabilium'>,
+  couchdb: CouchDBCredentials
 ): Client<'contabilium'> => {
-  return setClient(credentials, 'contabilium');
+  return setClient(credentials, 'contabilium', couchdb);
 };
 export { getQuickbooksClient, getSalesForceClient, getContabiliumClient };

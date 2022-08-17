@@ -1,9 +1,13 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+
+import nano from 'nano';
+
 /**Connector and client interface**/
 export interface IConnector {
   getClient<T extends ERPs>(
     credentials: erpCredentials<T>,
-    erp: T
+    erp: T,
+    couchdb: CouchDBCredentials
   ): Client<
     T extends 'quickbooks'
       ? 'quickbooks'
@@ -11,13 +15,13 @@ export interface IConnector {
       ? 'salesforce'
       : 'contabilium'
   >;
-  logIn(erp: ERPs, creds: any): void;
-  authenticate(apiCredentials: any): void; // Solo hace la autenticacion y guarda en el indexDB los datos para luego conectarse  
-  getCredentials(): any; // Toma del indexDB las credenciales del Merchant que luego es necceario para. el connect 
-  isAuthenticated(): boolean // Determina si esta autenticado el merchant
+  authenticate(apiCredentials: any, erp: ERPs): void; // Solo hace la autenticacion y guarda en el indexDB los datos para luego conectarse
+  setQuickbooksCredentials(
+    credentials: erpCredentials<'quickbooks'>
+  ): Promise<nano.DocumentInsertResponse>;
+  getCredentials<T extends ERPs>(erp: T): Promise<erpCredentials<T>>; // Toma del indexDB las credenciales del Merchant que luego es necceario para. el connect
+  isAuthenticated(): boolean; // Determina si esta autenticado el merchant
 }
-
-
 
 export interface IERPConnector {
   getInvoices(
@@ -32,6 +36,15 @@ export interface IERPConnector {
 export interface Client<A extends ERPs> {
   erpType: A;
   erpCredentials: erpCredentials<A>;
+  couchDB: {
+    credentials: CouchDBCredentials;
+    insertDocs(docs: Invoice[] | Customer[]): Promise<void>;
+    updateCredentials(
+      id: string,
+      erpType: ERPs,
+      erpCredentials: erpCredentials<ERPs>
+    ): Promise<nano.DocumentInsertResponse>;
+  };
   getInvoices(
     filters?: Filters,
     pagination?: Pagination,
@@ -41,14 +54,23 @@ export interface Client<A extends ERPs> {
   getCustomers(pagination?: Pagination, sort?: Sort): Promise<Customer[]>;
   getCustomer(id: string): Promise<Customer>;
 }
-
+export interface CouchDBDocs {
+  _id?: string;
+  _rev?: string;
+  type: 'invoice' | 'customer' | 'updatedAt' | 'merchant';
+}
+export interface CouchDBCredentials {
+  user: string;
+  password: string;
+  database: string;
+}
 /**ERPs  related objects**/
 export type erpCredentials<T extends ERPs> = T extends 'quickbooks'
   ? Quickbooks.client
   : T extends 'salesforce'
   ? SalesForce.client
   : Contabilium.client;
-export interface Invoice {
+export interface Invoice extends CouchDBDocs {
   id: string;
   products: Products[];
   customer: {
@@ -75,12 +97,12 @@ export interface Sort {
   fieldName: string;
   order: 'asc' | 'desc';
 }
-export interface Products {
+export interface Products extends CouchDBDocs {
   id?: string;
   description?: string;
   amount: number;
 }
-export interface Customer {
+export interface Customer extends CouchDBDocs {
   id: string;
   name: string;
   email?: string;
